@@ -30,7 +30,7 @@ public class Focus extends Program {
 	/** The red player. */
 	public final int RED = 1;
 	
-	public int uptoDepth = 4;
+	public int uptoDepth = 3;
 
 	/** The current player (GREEN or RED). */
 	private int currentPlayer;
@@ -41,16 +41,18 @@ public class Focus extends Program {
 	/** reserves[p] is the number of pieces player p has in reserve. */
 	private int[] reserves;
 	
+	/** capturedPieces[p] is the number of pieces player p has captured. */
+	private int[] capturedPieces;
+	
 	private SearchNode bestMove;
 	
 	public static void main(String[] args) {
 		Focus focus = new Focus();
 		
 		//Root
-		//focus.generateChildren(new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves()));
+		//focus.generateChildren(new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves(), focus.getCapturedPieces()));
 		
-		SearchNode node = new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves());
-		
+		SearchNode node = new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves(), focus.getCapturedPieces());
 		System.out.println(focus.alphaBetaMiniMax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, 1, focus.getCurrentPlayer()));
 		System.out.println(focus.getBestMove().getMove());
 		System.out.println("done");
@@ -82,6 +84,7 @@ public class Focus extends Program {
 		}
 		// Other setup
 		reserves = new int[2];
+		capturedPieces = new int[2];
 		currentPlayer = GREEN;
 		bestMove = null;
 	}
@@ -92,6 +95,14 @@ public class Focus extends Program {
 	
 	public int[] getReserves() {
 		return reserves;
+	}
+
+	public int[] getCapturedPieces() {
+		return capturedPieces;
+	}
+
+	public void setCapturedPieces(int[] capturedPieces) {
+		this.capturedPieces = capturedPieces;
 	}
 
 	public void setReserves(int[] reserves) {
@@ -118,57 +129,86 @@ public class Focus extends Program {
 	{
 		ArrayList<SearchNode> children = new ArrayList<>();
 		children.addAll(generateAllUpDownRightLeftMoves(node));
+		children.addAll(generateAllReserveMoves(node));
 		return children;
 		
 	}
 	
-	//Generate horse moves for non-blank tiles
-		private ArrayList<SearchNode> generateAllUpDownRightLeftMoves(SearchNode node) {
+	private ArrayList<SearchNode> generateAllUpDownRightLeftMoves(SearchNode node) {
 
-	        ArrayList<SearchNode> children = new ArrayList<>();
-	        ArrayList<Move> positions = new ArrayList<>();
- 
-			for(int i=0; i<BOARD_WIDTH; i++){
-				for(int j=0; j<node.getBoard()[i].length; j++){
-					if(node.getBoard()[i][j]!=null && isLegalSource(node.getBoard(), i,j, node.getPlayer()) && node.getBoard()[i][j].size()>=1 && node.getBoard()[i][j].getFront()== node.getPlayer()){
-			        	for(int numInPile=1; numInPile<=node.getBoard()[i][j].size(); numInPile++){
-		        			Move move1 = new Move(i, j, i-numInPile, j);
-			            	if (isValidPosition(move1, node.getBoard()) && isLegal(node.getBoard(),move1, node.getPlayer())) {
-			            		positions.add(move1); // Left
-			            	}
-				            
-			            	Move move2 = new Move(i, j, i+numInPile, j);
-				            if (isValidPosition(move2, node.getBoard()) && isLegal(node.getBoard(), move2, node.getPlayer())) {
-				                positions.add(move2); // Up
-				            }
-				            
-				            Move move3 = new Move(i, j, i, j-numInPile);
-				            if (isValidPosition(move3, node.getBoard()) && isLegal(node.getBoard(), move3, node.getPlayer())) {
-				                positions.add(move3); // Left
-				            }
-				            
-				            Move move4 = new Move(i, j, i, j+numInPile);
-				            if (isValidPosition(move4, node.getBoard()) && isLegal(node.getBoard(), move4, node.getPlayer())) {
-				                positions.add(move4); // Right
-				            }
-				            
-				            for (Move position: positions) {
-				                swapAndStore(node, position, children);
-				            }
-				            positions.clear();
-			        	}
+		ArrayList<SearchNode> children = new ArrayList<>();
+		ArrayList<Move> positions = new ArrayList<>();
+
+		for(int i=0; i<BOARD_WIDTH; i++){
+			for(int j=0; j<node.getBoard()[i].length; j++){
+				if(node.getBoard()[i][j]!=null && isLegalSource(node.getBoard(), i,j, node.getPlayer()) && node.getBoard()[i][j].size()>=1 && node.getBoard()[i][j].getFront()== node.getPlayer()){
+					for(int numInPile=1; numInPile<=node.getBoard()[i][j].size(); numInPile++){
+						Move move1 = new Move(i, j, i-numInPile, j);
+						if (isValidPosition(move1, node.getBoard()) && isLegal(node.getBoard(),move1, node.getPlayer())) {
+							positions.add(move1); // Left
+						}
+
+						Move move2 = new Move(i, j, i+numInPile, j);
+						if (isValidPosition(move2, node.getBoard()) && isLegal(node.getBoard(), move2, node.getPlayer())) {
+							positions.add(move2); // Up
+						}
+
+						Move move3 = new Move(i, j, i, j-numInPile);
+						if (isValidPosition(move3, node.getBoard()) && isLegal(node.getBoard(), move3, node.getPlayer())) {
+							positions.add(move3); // Left
+						}
+
+						Move move4 = new Move(i, j, i, j+numInPile);
+						if (isValidPosition(move4, node.getBoard()) && isLegal(node.getBoard(), move4, node.getPlayer())) {
+							positions.add(move4); // Right
+						}
+
+						for (Move position: positions) {
+							swapAndStoreRegularMove(node, position, children);
+						}
+						positions.clear();
 					}
 				}
-	        }
-			System.out.println(children.size());
-	        return children;
-    }
+			}
+		}
+		//System.out.println("Moves based on state: " + children.size());
+		return children;
+	}
+	
+	private ArrayList<SearchNode> generateAllReserveMoves(SearchNode node) {
+
+		ArrayList<SearchNode> children = new ArrayList<>();
+		ArrayList<Move> positions = new ArrayList<>();
+
+		if(node.getReserves()[node.getPlayer()]>=1){
+			for(int i=0; i<BOARD_WIDTH; i++){
+				for(int j=0; j<node.getBoard()[i].length; j++){
+					if(node.getBoard()[i][j]!=null){
+						for(int reserveCounter =0; reserveCounter<=node.getReserves()[node.getPlayer()]; reserveCounter++){
+							swapAndStoreReserveMove(node, i , j, children);
+							positions.clear();
+						}
+					}
+				}
+			}
+		}
+		//System.out.println("Moves from reserve  : " + children.size());
+		return children;
+	}
 		
-	private void swapAndStore(SearchNode node, Move position, ArrayList<SearchNode> children)
+	private void swapAndStoreRegularMove(SearchNode node, Move position, ArrayList<SearchNode> children)
 	{	
-		SearchNode newNode = new SearchNode(node, copyBoard(node.getBoard()), node.getPlayer(), copyReserves(node.getReserves()), position);
+		SearchNode newNode = new SearchNode(node, copyBoard(node.getBoard()), node.getPlayer(), copyArray(node.getReserves()), copyArray(node.getCapturedPieces()), position);
 		//Apply the move
 		move(newNode);
+		children.add(newNode);
+	}
+	
+	private void swapAndStoreReserveMove(SearchNode node, int row, int column, ArrayList<SearchNode> children)
+	{	
+		SearchNode newNode = new SearchNode(node, copyBoard(node.getBoard()), node.getPlayer(), copyArray(node.getReserves()), copyArray(node.getCapturedPieces()), new Move(-1, -1, row, column), true);
+		//Apply the move
+		playFromReserves(newNode, row, column);
 		children.add(newNode);
 	}
 	
@@ -185,8 +225,8 @@ public class Focus extends Program {
 	}
 	
 	// Deep Copy method
-	public int[] copyReserves(int[] src){
-		int[] dest = new int[5];
+	public int[] copyArray(int[] src){
+		int[] dest = new int[src.length];
 		System.arraycopy( src, 0, dest, 0, src.length );
 		return dest;
 	}
@@ -218,11 +258,6 @@ public class Focus extends Program {
         		&& board[move.getr1()][move.getc1()] != null
         		&& board[move.getr2()][move.getc2()] != null;
         		
-        		//if(status){
-        		//	counter++;
-        		//	System.out.println(counter + ":   " + move.getr1() + "," + move.getc1() + " to " + move.getr2() + "," + move.getc2());
-        		//}
-        		
         		return status;
     }
 
@@ -246,10 +281,17 @@ public class Focus extends Program {
 	 * move.
 	 */
 	protected boolean gameOver() {
+		
+		//More than 8 pieces need to be captured to win
+		if (capturedPieces[currentPlayer] >=8) {
+			return true;
+		}
+		
 		// Check the current player's reserves
 		if (reserves[currentPlayer] > 0) {
 			return false;
 		}
+		
 		// Check for friendly piles
 		for (int r1 = 0; r1 < BOARD_WIDTH; r1++) {
 			for (int c1 = 0; c1 < BOARD_WIDTH; c1++) {
@@ -266,6 +308,12 @@ public class Focus extends Program {
 	 * move.
 	 */
 	protected boolean gameOver(SearchNode node) {
+		
+		//More than 8 pieces need to be captured to win
+		if (node.getCapturedPieces()[node.getPlayer()] >=8) {
+			return true;
+		}
+		
 		// Check the current player's reserves
 		if (node.getReserves()[node.getPlayer()] > 0) {
 			return false;
@@ -400,6 +448,9 @@ public class Focus extends Program {
 			if (removed == currentPlayer) {
 				reserves[currentPlayer]++;
 			}
+			if (removed != currentPlayer) {
+				capturedPieces[currentPlayer]++;
+			}
 		}
 		currentPlayer = opposite(currentPlayer);
 	}
@@ -413,6 +464,9 @@ public class Focus extends Program {
 			if (removed == node.getPlayer()) {
 				node.getReserves()[node.getPlayer()]++;
 			}
+			if (removed != node.getPlayer()) {
+				node.getCapturedPieces()[node.getPlayer()]++;
+			}
 		}
 		//node.getPlayer()) = opposite(node.getPlayer()));
 	}
@@ -424,10 +478,23 @@ public class Focus extends Program {
 		hand.addFront(currentPlayer);
 		place(hand, r, c);
 	}
+	
+	/** Plays a piece from reserves to square r, c. */
+	protected void playFromReserves(SearchNode node, int r, int c) {
+		node.getReserves()[node.getPlayer()]--;
+		Pile hand = new Pile();
+		hand.addFront(node.getPlayer());
+		place(node, hand, r, c);
+	}
 
 	/** Returns the number of pieces color has in reserve. */
 	protected int reserves(int color) {
 		return reserves[color];
+	}
+	
+	/** Returns the number of pieces color has captured. */
+	protected int capturedPieces(int color) {
+		return capturedPieces[color];
 	}
 
 	/** Plays the game. */
@@ -567,13 +634,39 @@ public class Focus extends Program {
 	}
 	
 	private int playerOneHeuristic(SearchNode node) {
-		// TODO Auto-generated method stub
-		return 1;
+		int numOfOpponentPieces = 0;
+		
+		for(int i=0; i<BOARD_WIDTH; i++){
+			for(int j=0; j<node.getBoard()[i].length; j++){
+				if(node.getBoard()[i][j]!=null && node.getBoard()[i][j].size()>=1){
+					if(node.getBoard()[i][j].getFront() == node.getPlayer()){
+						numOfOpponentPieces++;
+					}
+				}
+			}
+		}
+		
+		return numOfOpponentPieces - node.getCapturedPieces()[node.getPlayer()];
+		
 	}
 
 	private int playerTwoHeuristic(SearchNode node) {
-		// TODO Auto-generated method stub
-		return 2;
+		
+		int min = 0;
+		int max = 0;
+		for(int i=0; i<BOARD_WIDTH; i++){
+			for(int j=0; j<node.getBoard()[i].length; j++){
+				if(node.getBoard()[i][j]!=null){
+					max++;
+					if(node.getBoard()[i][j].size()>=1){
+						min++;
+					}
+				}
+			}
+		}
+		
+		Random random = new Random();
+		return random.nextInt(max - min + 1) + min;
 	}
 
 }
