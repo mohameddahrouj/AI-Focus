@@ -9,6 +9,11 @@ import static focus.FocusGui.*;
 /** Graphic square in the Focus game. */
 public class Square extends Rectangle {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/** Column of this square. */
 	private int column;
 	

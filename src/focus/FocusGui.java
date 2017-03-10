@@ -8,6 +8,11 @@ import gui.*;
 /** GUI for the Focus game. */
 public class FocusGui extends Gui {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/** Mode choosing a destination. */
 	public static final int CHOOSING_DESTINATION = 1;
 	

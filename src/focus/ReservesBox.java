@@ -11,6 +11,11 @@ import static focus.FocusGui.*;
 /** Graphic box listing reserves for one player in the Focus game. */
 public class ReservesBox extends Rectangle {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/** Gui to which this box is attached. */
 	private FocusGui gui;
 	

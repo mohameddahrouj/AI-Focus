@@ -7,6 +7,10 @@ import gui.Ellipse;
 /** Graphic representation of one piece in the Focus game. */
 public class PieceGui extends Ellipse {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/** The (graphic) square on which this piece appears. */
 	private Square square;
 
