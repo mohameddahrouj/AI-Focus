@@ -1,6 +1,5 @@
 package focus;
 
-import static focus.Focus.*;
 import java.awt.Color;
 
 import gui.*;
@@ -54,9 +53,9 @@ public class FocusGui extends Gui {
 
 	public FocusGui() {
 		game = new Focus();
-		squares = new Square[BOARD_WIDTH][BOARD_WIDTH];
-		for (int r = 0; r < BOARD_WIDTH; r++) {
-			for (int c = 0; c < BOARD_WIDTH; c++) {
+		squares = new Square[game.BOARD_WIDTH][game.BOARD_WIDTH];
+		for (int r = 0; r < game.BOARD_WIDTH; r++) {
+			for (int c = 0; c < game.BOARD_WIDTH; c++) {
 				if (game.isOnBoard(r, c )) {
 					squares[r][c] = new Square(r, c, this);
 					add(squares[r][c], 125 + c * 50, 25 + r * 50);
@@ -64,10 +63,10 @@ public class FocusGui extends Gui {
 			}
 		}
 		reservesBoxes = new ReservesBox[3];
-		reservesBoxes[GREEN] = new ReservesBox(GREEN, this);
-		reservesBoxes[RED] = new ReservesBox(RED, this);
-		add(reservesBoxes[GREEN], 150, 450);
-		add(reservesBoxes[RED], 450, 450);
+		reservesBoxes[game.GREEN] = new ReservesBox(game.GREEN, this);
+		reservesBoxes[game.RED] = new ReservesBox(game.RED, this);
+		add(reservesBoxes[game.GREEN], 150, 450);
+		add(reservesBoxes[game.RED], 450, 450);
 		mode = CHOOSING_SOURCE;
 		instructions = new Label("Green: click on source square or reserves.");
 		add(instructions, 300, 550);
@@ -78,7 +77,7 @@ public class FocusGui extends Gui {
 		squares[row][column].update();
 		mode = CHOOSING_SOURCE;
 		String color;
-		if (game.getCurrentPlayer() == GREEN) {
+		if (game.getCurrentPlayer() == game.GREEN) {
 			color = "Green";
 		} else {
 			color = "Red";

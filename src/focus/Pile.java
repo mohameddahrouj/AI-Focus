@@ -1,7 +1,5 @@
 package focus;
 
-import static focus.Focus.*;
-
 /**
  * A pile of pieces for the Focus game. The top of the pile corresponds to the
  * front of the deque. The sole purpose of this class is to provide a
@@ -14,7 +12,7 @@ public class Pile extends Deque {
 	public String toString() {
 		String result = "";
 		for (Node n = getFrontNode(); n != null; n = n.getNext()) {
-			if (n.getKey() == GREEN) {
+			if (n.getKey() == 0){//GREEN
 				result += "#";
 			} else {
 				result += "O";

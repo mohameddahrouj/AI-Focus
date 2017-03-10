@@ -1,6 +1,4 @@
 package focus;
-
-import static focus.Focus.*;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -33,9 +31,9 @@ public class FocusTest {
 	@Test
 	public void testIsLegal() {
 		Pile p = new Pile();
-		p.addFront(GREEN);
+		p.addFront(game.GREEN);
 		// The piece below is played from imaginary reserves
-		p.addFront(GREEN);
+		p.addFront(game.GREEN);
 		game.setPile(1, 3, p);
 		assertTrue(game.isLegal(new Move(1, 3, 1, 5)));
 		assertTrue(game.isLegal(new Move(1, 3, 0, 3)));
@@ -48,10 +46,10 @@ public class FocusTest {
 	
 	@Test
 	public void testIsCorrectColour() {
-		assertTrue(game.getPile(1,1).getFront() == GREEN);
-		assertTrue(game.getPile(1,2).getFront() == GREEN);
-		assertTrue(game.getPile(2,1).getFront() == RED);
-		assertTrue(game.getPile(2,2).getFront() == RED);
+		assertTrue(game.getPile(1,1).getFront() == game.GREEN);
+		assertTrue(game.getPile(1,2).getFront() == game.GREEN);
+		assertTrue(game.getPile(2,1).getFront() == game.RED);
+		assertTrue(game.getPile(2,2).getFront() == game.RED);
 	}
 
 	@Test
@@ -70,13 +68,13 @@ public class FocusTest {
 
 	@Test
 	public void testPlayFromReserves() {
-		// Not actually a legal move because green has no reserves, but we can
+		// Not actually a legal move because game.GREEN has no reserves, but we can
 		// test the effects anyway
 		game.playFromReserves(3, 7);
 		String correct = " 01234567\n0  ....  0\n1 ##OO## 1\n2.OO##OO.2\n3.##OO###3\n4.OO##OO.4\n5.##OO##.5\n6 OO##OO 6\n7  ....  7\n 01234567\nReserves: # -1, O 0\n";
 		assertEquals(correct, game.toString());
 		assertEquals("#", game.getPile(3, 7).toString());
-		assertEquals(-1, game.reserves(GREEN));
+		assertEquals(-1, game.reserves(game.GREEN));
 	}
 
 	@Test
@@ -87,34 +85,34 @@ public class FocusTest {
 
 	@Test
 	public void testColorToPlay() {
-		assertEquals(GREEN, game.getCurrentPlayer());
+		assertEquals(game.GREEN, game.getCurrentPlayer());
 		game.move(new Move(4, 5, 5, 5));
-		assertEquals(RED, game.getCurrentPlayer());
+		assertEquals(game.RED, game.getCurrentPlayer());
 		game.move(new Move(5, 1, 6, 1));
-		assertEquals(GREEN, game.getCurrentPlayer());
+		assertEquals(game.GREEN, game.getCurrentPlayer());
 	}
 
 	@Test
 	public void testReserves() {
-		assertEquals(0, game.reserves(GREEN));
-		assertEquals(0, game.reserves(RED));
+		assertEquals(0, game.reserves(game.GREEN));
+		assertEquals(0, game.reserves(game.RED));
 		// Some of these moves are not legal (wrong color to play)
 		game.move(new Move(2, 3, 3, 3));
 		game.move(new Move(3, 3, 5, 3));
 		game.move(new Move(5, 3, 5, 6));
 		game.move(new Move(5, 6, 1, 6));
 		game.move(new Move(1, 6, 1, 1));
-		assertEquals(1, game.reserves(GREEN));
-		assertEquals(0, game.reserves(RED));
+		assertEquals(1, game.reserves(game.GREEN));
+		assertEquals(0, game.reserves(game.RED));
 		game.move(new Move(2, 1, 1, 1));
-		assertEquals(1, game.reserves(GREEN));
-		assertEquals(0, game.reserves(RED));		
+		assertEquals(1, game.reserves(game.GREEN));
+		assertEquals(0, game.reserves(game.RED));		
 	}
 
 	@Test
 	public void testGameOver() {
-		for (int r = 0; r < BOARD_WIDTH; r++) {
-			for (int c = 0; c < BOARD_WIDTH; c++) {
+		for (int r = 0; r < game.BOARD_WIDTH; r++) {
+			for (int c = 0; c < game.BOARD_WIDTH; c++) {
 				Deque p = game.getPile(r, c);
 				if (p != null) {
 					p.clear();
@@ -122,9 +120,9 @@ public class FocusTest {
 			}
 		}
 		Pile q = new Pile();
-		q.addFront(RED);
+		q.addFront(game.RED);
 		game.setPile(4, 4, q);
-		game.setReserves(GREEN, 1);
+		game.setReserves(game.GREEN, 1);
 		assertFalse(game.gameOver());
 		game.playFromReserves(3, 4);
 		assertFalse(game.gameOver());

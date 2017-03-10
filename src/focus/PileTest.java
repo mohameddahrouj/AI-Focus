@@ -1,6 +1,5 @@
 package focus;
 
-import static focus.Focus.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +15,8 @@ public class PileTest {
 
 	@Test
 	public void testToString() {
-		pile.addFront(RED);
-		pile.addBack(GREEN);
+		pile.addFront(0);//GREEN
+		pile.addBack(1);//RED
 		assertEquals("O#", pile.toString());
 	}
 

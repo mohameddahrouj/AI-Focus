@@ -5,7 +5,6 @@ import java.awt.event.*;
 import gui.*;
 
 import static java.awt.Color.*;
-import static focus.Focus.GREEN;
 import static focus.FocusGui.*;
 
 /** Graphic box listing reserves for one player in the Focus game. */
@@ -49,7 +48,7 @@ public class ReservesBox extends Rectangle {
 		} else {
 			setFill(LIGHT_ORANGE);
 		}
-		if (color == GREEN) {
+		if (color == 0) {//green
 			setText("Green reserves: " + gui.getGame().reserves(color));
 		} else {
 			setText("Red reserves: " + gui.getGame().reserves(color));			
