@@ -1,5 +1,7 @@
 package focus;
 
+import java.util.Arrays;
+
 /**
  * 
  * Represents search nodes for different algorithms
@@ -13,19 +15,52 @@ package focus;
 public class SearchNode
 {
 	private SearchNode parent;
-	private Focus curState;
-	private double cost;    // cost to get to this state
-	private double hCost; 	// heuristic cost
-	private double fCost; 	// function cost
+	
+	private Pile[][] board;
+	private int player;
+	private int[] reserves;
+	
+	private Move move;
+	
+	private int cost;    // cost to get to this state
+	private int hCost; 	// heuristic cost
+	private int fCost; 	// function cost
+	
+	//Copy Constructor
+	public SearchNode(SearchNode sn)
+	{
+		if(sn.getParent()!=null){
+			this.parent = new SearchNode(sn.getParent());
+		}
+		else{
+			this.parent= null;
+		}
+		this.board = copyBoard(sn.getBoard());
+		this.player = sn.getPlayer();
+		this.reserves = copyReserves(sn.getReserves());
+		if(sn.getMove()!=null){
+			this.move = new Move(sn.getMove().getr1(), sn.getMove().getc1(), sn.getMove().getr2(), sn.getMove().getc2());
+		}
+		else{
+			this.move= null;
+		}
+		this.cost = sn.getCost();
+		this.hCost = sn.gethCost();
+		this.fCost = sn.getCost() + sn.gethCost();
+	}
+	
 	
 	// Constructor for the root
-	public SearchNode(Focus s)
+	public SearchNode(Pile[][] board, int player, int[] reserves)
 	{
-		curState = s;
 		parent = null;
-		cost = 0;
-		hCost = 0;
-		fCost = 0;
+		this.board = copyBoard(board);
+		this.player = player;
+		this.reserves = copyReserves(reserves);
+		this.move = null;
+		this.cost = 0;
+		this.hCost = 0;
+		this.fCost = 0;
 	}
 
 	// Constructor for all other SearchNodes
@@ -34,18 +69,76 @@ public class SearchNode
 	// Used for A*:
     //             c = g(n) cost to get to this node
 	//             h = h(n) cost to get to this node
-	public SearchNode(SearchNode prev, Focus s, double c, double h)
+	public SearchNode(SearchNode parent, Pile[][] board, int player, int[] reserves, Move move, int cost, int hCost)
 	{
-		parent = prev;
-		curState = s;
-		cost = c;
-		hCost = h;
-		fCost = cost + hCost;
+		if(parent!=null){
+			this.parent = new SearchNode(parent);
+		}
+		else{
+			this.parent= null;
+		}
+		this.board = copyBoard(board);
+		this.player = player;
+		this.reserves = copyReserves(reserves);		
+		if(move!=null){
+			this.move = new Move(move.getr1(), move.getc1(), move.getr2(), move.getc2());
+		}
+		else{
+			this.move= null;
+		}
+		this.cost = cost;
+		this.hCost = hCost;
+		this.fCost = cost + hCost;
+	}
+	
+	public SearchNode(SearchNode parent, Pile[][] board, int player, int[] reserves, Move move)
+	{
+		if(parent!=null){
+			this.parent = new SearchNode(parent);
+		}
+		else{
+			this.parent= null;
+		}
+		this.board = copyBoard(board);
+		this.player = player;
+		this.reserves = copyReserves(reserves);
+		if(move!=null){
+			this.move = new Move(move.getr1(), move.getc1(), move.getr2(), move.getc2());
+		}
+		else{
+			this.move= null;
+		}
+		this.cost = 0;
+		this.hCost = 0;
+		this.fCost = 0;
 	}
 
-	public Focus getCurrentState()
-	{
-		return curState;
+	public Pile[][] getBoard() {
+		return board;
+	}
+
+	public int getPlayer() {
+		return player;
+	}
+
+	public int[] getReserves() {
+		return reserves;
+	}
+
+	public Move getMove() {
+		return move;
+	}
+
+	public int gethCost() {
+		return hCost;
+	}
+
+	public int getfCost() {
+		return fCost;
+	}
+
+	public int getCost() {
+		return cost;
 	}
 
 	public SearchNode getParent()
@@ -53,21 +146,55 @@ public class SearchNode
 		return parent;
 	}
 
-	//g(n) cost for A*
-	public double getCost()
-	{
-		return cost;
+	public void setParent(SearchNode parent) {
+		this.parent = parent;
 	}
 
-	//h(n) cost for A*
-	public double getHCost()
-	{
-		return hCost;
+	public void setBoard(Pile[][] board) {
+		this.board = board;
 	}
 
-	//f(n) cost for A*
-	public double getFCost()
-	{
-		return fCost;
+	public void setPlayer(int player) {
+		this.player = player;
+	}
+
+	public void setReserves(int[] reserves) {
+		this.reserves = reserves;
+	}
+
+	public void setMove(Move move) {
+		this.move = move;
+	}
+
+	public void setCost(int cost) {
+		this.cost = cost;
+	}
+
+	public void sethCost(int hCost) {
+		this.hCost = hCost;
+	}
+
+	public void setfCost(int fCost) {
+		this.fCost = fCost;
+	}
+	
+	// Deep Copy method
+	public static Pile[][] copyBoard(Pile[][] original) {
+	    if (original == null) {
+	        return null;
+	    }
+
+	    final Pile[][] copy = new Pile[original.length][];
+	    for (int i = 0; i < original.length; i++) {
+	        copy[i] = Arrays.copyOf(original[i], original[i].length);
+	    }
+	    return copy;
+	}
+	
+	// Deep Copy method
+	public int[] copyReserves(int[] src){
+		int[] dest = new int[5];
+		System.arraycopy( src, 0, dest, 0, src.length );
+		return dest;
 	}
 }
