@@ -19,12 +19,13 @@ public class SearchNode
 	private Pile[][] board;
 	private int player;
 	private int[] reserves;
+	private int[] capturedPieces;
 	
 	private Move move;
 	
+	private boolean playFromReserves;
+	
 	private int cost;    // cost to get to this state
-	private int hCost; 	// heuristic cost
-	private int fCost; 	// function cost
 	
 	//Copy Constructor
 	public SearchNode(SearchNode sn)
@@ -37,7 +38,8 @@ public class SearchNode
 		}
 		this.board = copyBoard(sn.getBoard());
 		this.player = sn.getPlayer();
-		this.reserves = copyReserves(sn.getReserves());
+		this.reserves = copyArray(sn.getReserves());
+		this.capturedPieces = copyArray(sn.getCapturedPieces());
 		if(sn.getMove()!=null){
 			this.move = new Move(sn.getMove().getr1(), sn.getMove().getc1(), sn.getMove().getr2(), sn.getMove().getc2());
 		}
@@ -45,22 +47,23 @@ public class SearchNode
 			this.move= null;
 		}
 		this.cost = sn.getCost();
-		this.hCost = sn.gethCost();
-		this.fCost = sn.getCost() + sn.gethCost();
+		
+		this.playFromReserves = false;
 	}
 	
 	
 	// Constructor for the root
-	public SearchNode(Pile[][] board, int player, int[] reserves)
+	public SearchNode(Pile[][] board, int player, int[] reserves, int[] capturedPieces)
 	{
 		parent = null;
 		this.board = copyBoard(board);
 		this.player = player;
-		this.reserves = copyReserves(reserves);
+		this.reserves = copyArray(reserves);
+		this.capturedPieces = copyArray(capturedPieces);
 		this.move = null;
 		this.cost = 0;
-		this.hCost = 0;
-		this.fCost = 0;
+		
+		this.playFromReserves = false;
 	}
 
 	// Constructor for all other SearchNodes
@@ -69,7 +72,7 @@ public class SearchNode
 	// Used for A*:
     //             c = g(n) cost to get to this node
 	//             h = h(n) cost to get to this node
-	public SearchNode(SearchNode parent, Pile[][] board, int player, int[] reserves, Move move, int cost, int hCost)
+	public SearchNode(SearchNode parent, Pile[][] board, int player, int[] reserves, int[] capturedPieces, Move move, int cost)
 	{
 		if(parent!=null){
 			this.parent = new SearchNode(parent);
@@ -79,7 +82,8 @@ public class SearchNode
 		}
 		this.board = copyBoard(board);
 		this.player = player;
-		this.reserves = copyReserves(reserves);		
+		this.reserves = copyArray(reserves);
+		this.capturedPieces = copyArray(capturedPieces);
 		if(move!=null){
 			this.move = new Move(move.getr1(), move.getc1(), move.getr2(), move.getc2());
 		}
@@ -87,11 +91,10 @@ public class SearchNode
 			this.move= null;
 		}
 		this.cost = cost;
-		this.hCost = hCost;
-		this.fCost = cost + hCost;
+		this.playFromReserves = false;
 	}
 	
-	public SearchNode(SearchNode parent, Pile[][] board, int player, int[] reserves, Move move)
+	public SearchNode(SearchNode parent, Pile[][] board, int player, int[] reserves, int[] capturedPieces, Move move)
 	{
 		if(parent!=null){
 			this.parent = new SearchNode(parent);
@@ -101,7 +104,8 @@ public class SearchNode
 		}
 		this.board = copyBoard(board);
 		this.player = player;
-		this.reserves = copyReserves(reserves);
+		this.reserves = copyArray(reserves);
+		this.capturedPieces = copyArray(capturedPieces);
 		if(move!=null){
 			this.move = new Move(move.getr1(), move.getc1(), move.getr2(), move.getc2());
 		}
@@ -109,8 +113,30 @@ public class SearchNode
 			this.move= null;
 		}
 		this.cost = 0;
-		this.hCost = 0;
-		this.fCost = 0;
+		this.playFromReserves = false;
+	}
+
+	
+	public SearchNode(SearchNode parent, Pile[][] board, int player, int[] reserves, int[] capturedPieces, Move move, boolean playFromReserves)
+	{
+		if(parent!=null){
+			this.parent = new SearchNode(parent);
+		}
+		else{
+			this.parent= null;
+		}
+		this.board = copyBoard(board);
+		this.player = player;
+		this.reserves = copyArray(reserves);
+		this.capturedPieces = copyArray(capturedPieces);
+		if(move!=null){
+			this.move = new Move(move.getr1(), move.getc1(), move.getr2(), move.getc2());
+		}
+		else{
+			this.move= null;
+		}
+		this.cost = 0;
+		this.playFromReserves = playFromReserves;
 	}
 
 	public Pile[][] getBoard() {
@@ -120,21 +146,33 @@ public class SearchNode
 	public int getPlayer() {
 		return player;
 	}
+	
+	public boolean isPlayFromReserves() {
+		return playFromReserves;
+	}
+
+
+	public void setPlayFromReserves(boolean playFromReserves) {
+		this.playFromReserves = playFromReserves;
+	}
+
 
 	public int[] getReserves() {
 		return reserves;
 	}
 
+	public int[] getCapturedPieces() {
+		return capturedPieces;
+	}
+
+
+	public void setCapturedPieces(int[] capturedPieces) {
+		this.capturedPieces = capturedPieces;
+	}
+
+
 	public Move getMove() {
 		return move;
-	}
-
-	public int gethCost() {
-		return hCost;
-	}
-
-	public int getfCost() {
-		return fCost;
 	}
 
 	public int getCost() {
@@ -169,14 +207,6 @@ public class SearchNode
 	public void setCost(int cost) {
 		this.cost = cost;
 	}
-
-	public void sethCost(int hCost) {
-		this.hCost = hCost;
-	}
-
-	public void setfCost(int fCost) {
-		this.fCost = fCost;
-	}
 	
 	// Deep Copy method
 	public Pile[][] copyBoard(Pile[][] fboard){
@@ -191,8 +221,8 @@ public class SearchNode
 	}
 	
 	// Deep Copy method
-	public int[] copyReserves(int[] src){
-		int[] dest = new int[5];
+	public int[] copyArray(int[] src){
+		int[] dest = new int[src.length];
 		System.arraycopy( src, 0, dest, 0, src.length );
 		return dest;
 	}
