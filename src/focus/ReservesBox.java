@@ -49,9 +49,9 @@ public class ReservesBox extends Rectangle {
 			setFill(LIGHT_ORANGE);
 		}
 		if (color == 0) {//green
-			setText("Green reserves: " + gui.getGame().reserves(color));
+			setText("Green reserves: " + gui.getGame().reserves(color) + " | Captured: " + gui.getGame().capturedPieces(color));
 		} else {
-			setText("Red reserves: " + gui.getGame().reserves(color));			
+			setText("Red reserves: " + gui.getGame().reserves(color) + " | Captured: " + gui.getGame().capturedPieces(color));			
 		}
 	}
 

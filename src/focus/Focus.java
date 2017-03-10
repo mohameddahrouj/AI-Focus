@@ -283,7 +283,7 @@ public class Focus extends Program {
 	protected boolean gameOver() {
 		
 		//More than 8 pieces need to be captured to win
-		if (capturedPieces[currentPlayer] >=8) {
+		if (capturedPieces[currentPlayer] >=3) {
 			return true;
 		}
 		

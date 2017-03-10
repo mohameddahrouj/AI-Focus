@@ -2,6 +2,8 @@ package focus;
 
 import java.awt.Color;
 
+import javax.swing.JOptionPane;
+
 import gui.*;
 
 /** GUI for the Focus game. */
@@ -84,6 +86,7 @@ public class FocusGui extends Gui {
 		}
 		if (game.gameOver()) {
 			instructions.setText("Game over.");
+			JOptionPane.showMessageDialog(this, color + ", you won!", "Winner Detected", JOptionPane.PLAIN_MESSAGE);
 		} else {
 			instructions.setText(color + ": click on source square or reserves.");
 		}
