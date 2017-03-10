@@ -17,7 +17,7 @@ public class PileTest {
 	public void testToString() {
 		pile.addFront(0);//GREEN
 		pile.addBack(1);//RED
-		assertEquals("O#", pile.toString());
+		assertEquals("#O", pile.toString());
 	}
 
 }
