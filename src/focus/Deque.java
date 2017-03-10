@@ -1,14 +1,21 @@
 package focus;
 
+import java.io.Serializable;
+
 /** A linked, double-ended queue of ints. */
-public class Deque {
+public class Deque implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/** The back node in this deque; undefined if this deque is empty. */
 	private Node back;
 
 	/** The front node in this deque, or null if this deque is empty. */
 	private Node front;
-
+	
 	/** Adds key to the back of this deque. */
 	public void addBack(int key) {
 		if (isEmpty()) {

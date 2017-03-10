@@ -1,7 +1,14 @@
 package focus;
 
+import java.io.Serializable;
+
 /** A linked list node, for use in a Deque. */
-public class Node {
+public class Node implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/** The key of this node. */
 	private int key;

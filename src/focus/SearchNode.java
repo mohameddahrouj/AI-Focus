@@ -1,6 +1,6 @@
 package focus;
 
-import java.util.Arrays;
+import java.io.*;
 
 /**
  * 
@@ -179,16 +179,15 @@ public class SearchNode
 	}
 	
 	// Deep Copy method
-	public static Pile[][] copyBoard(Pile[][] original) {
-	    if (original == null) {
-	        return null;
-	    }
-
-	    final Pile[][] copy = new Pile[original.length][];
-	    for (int i = 0; i < original.length; i++) {
-	        copy[i] = Arrays.copyOf(original[i], original[i].length);
-	    }
-	    return copy;
+	public Pile[][] copyBoard(Pile[][] fboard){
+		Pile[][] result = new Pile[fboard.length][fboard.length];
+		for(int r = 0; r < fboard.length; r++){
+			for(int s = 0; s < fboard.length; s++){
+				result[r][s] = (Pile)deepClone(fboard[r][s]);
+			}
+		}
+		
+		return result;
 	}
 	
 	// Deep Copy method
@@ -197,4 +196,22 @@ public class SearchNode
 		System.arraycopy( src, 0, dest, 0, src.length );
 		return dest;
 	}
+	
+	/**
+	 * This method makes a "deep clone" of any Java object it is given.
+	 */
+	 public static Object deepClone(Object object) {
+	   try {
+	     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	     ObjectOutputStream oos = new ObjectOutputStream(baos);
+	     oos.writeObject(object);
+	     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+	     ObjectInputStream ois = new ObjectInputStream(bais);
+	     return ois.readObject();
+	   }
+	   catch (Exception e) {
+	     e.printStackTrace();
+	     return null;
+	   }
+	 }
 }

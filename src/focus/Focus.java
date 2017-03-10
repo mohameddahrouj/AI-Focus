@@ -1,5 +1,6 @@
 package focus;
 
+import java.io.*;
 import java.lang.Math;
 
 import java.util.*;
@@ -46,12 +47,12 @@ public class Focus extends Program {
 		Focus focus = new Focus();
 		
 		//Root
-		focus.generateChildren(new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves()));
+		//focus.generateChildren(new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves()));
 		
-		//SearchNode node = new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves());
+		SearchNode node = new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves());
 		
-		//System.out.println(focus.alphaBetaMiniMax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, 1, focus.getCurrentPlayer()));
-		//System.out.println(focus.getBestMove().getMove());
+		System.out.println(focus.alphaBetaMiniMax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, 1, focus.getCurrentPlayer()));
+		System.out.println(focus.getBestMove().getMove());
 		System.out.println("done");
 		
 		
@@ -111,14 +112,6 @@ public class Focus extends Program {
 
 	public void setBestMove(SearchNode bestMove) {
 		this.bestMove = bestMove;
-	}
-
-	public Focus(Pile[][] piles, int[] reserves, int currentPlayer) {
-		// Initialize piles
-		this.piles = piles;
-		// Other setup
-		this.reserves = reserves;
-		this.currentPlayer = currentPlayer;
 	}
 	
 	public ArrayList<SearchNode> generateChildren(SearchNode node)
@@ -180,16 +173,15 @@ public class Focus extends Program {
 	}
 	
 	// Deep Copy method
-	public Pile[][] copyBoard(Pile[][] original) {
-	    if (original == null) {
-	        return null;
-	    }
-
-	    final Pile[][] copy = new Pile[original.length][];
-	    for (int i = 0; i < original.length; i++) {
-	        copy[i] = Arrays.copyOf(original[i], original[i].length);
-	    }
-	    return copy;
+	public Pile[][] copyBoard(Pile[][] fboard){
+		Pile[][] result = new Pile[fboard.length][fboard.length];
+		for(int r = 0; r < fboard.length; r++){
+			for(int s = 0; s < fboard.length; s++){
+				result[r][s] = (Pile)deepClone(fboard[r][s]);
+			}
+		}
+		
+		return result;
 	}
 	
 	// Deep Copy method
@@ -198,6 +190,24 @@ public class Focus extends Program {
 		System.arraycopy( src, 0, dest, 0, src.length );
 		return dest;
 	}
+	
+	/**
+	 * This method makes a "deep clone" of any Java object it is given.
+	 */
+	 public static Object deepClone(Object object) {
+	   try {
+	     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	     ObjectOutputStream oos = new ObjectOutputStream(baos);
+	     oos.writeObject(object);
+	     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+	     ObjectInputStream ois = new ObjectInputStream(bais);
+	     return ois.readObject();
+	   }
+	   catch (Exception e) {
+	     e.printStackTrace();
+	     return null;
+	   }
+	 }
 	
     private  boolean isValidPosition(Move move, Pile[][] board)
     {
