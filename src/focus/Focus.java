@@ -30,7 +30,7 @@ public class Focus extends Program {
 	/** The red player. */
 	public final int RED = 1;
 	
-	public int uptoDepth = 3;
+	public int uptoDepth = 2;
 
 	/** The current player (GREEN or RED). */
 	private int currentPlayer;
@@ -50,11 +50,11 @@ public class Focus extends Program {
 		Focus focus = new Focus();
 		
 		//Root
-		//focus.generateChildren(new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves(), focus.getCapturedPieces()));
+		focus.generateChildren(new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves(), focus.getCapturedPieces()));
 		
-		SearchNode node = new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves(), focus.getCapturedPieces());
-		System.out.println(focus.alphaBetaMiniMax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, 1, focus.getCurrentPlayer()));
-		System.out.println(focus.getBestMove().getMove());
+		//SearchNode node = new SearchNode(focus.getPiles(), focus.getCurrentPlayer(), focus.getReserves(), focus.getCapturedPieces());
+		//System.out.println(focus.alphaBetaMiniMax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, 1, focus.getCurrentPlayer()));
+		//System.out.println(focus.getBestMove().getMove());
 		System.out.println("done");
 		
 		
@@ -102,11 +102,11 @@ public class Focus extends Program {
 	}
 
 	public void setCapturedPieces(int[] capturedPieces) {
-		this.capturedPieces = capturedPieces;
+		this.capturedPieces = copyArray(capturedPieces);
 	}
 
 	public void setReserves(int[] reserves) {
-		this.reserves = reserves;
+		this.reserves = copyArray(reserves);
 	}
 
 	public void setCurrentPlayer(int currentPlayer) {
@@ -114,7 +114,7 @@ public class Focus extends Program {
 	}
 
 	public void setPiles(Pile[][] piles) {
-		this.piles = piles;
+		this.piles = copyBoard(piles);
 	}
 
 	public SearchNode getBestMove() {
@@ -178,16 +178,12 @@ public class Focus extends Program {
 	private ArrayList<SearchNode> generateAllReserveMoves(SearchNode node) {
 
 		ArrayList<SearchNode> children = new ArrayList<>();
-		ArrayList<Move> positions = new ArrayList<>();
 
 		if(node.getReserves()[node.getPlayer()]>=1){
 			for(int i=0; i<BOARD_WIDTH; i++){
 				for(int j=0; j<node.getBoard()[i].length; j++){
 					if(node.getBoard()[i][j]!=null){
-						for(int reserveCounter =0; reserveCounter<=node.getReserves()[node.getPlayer()]; reserveCounter++){
 							swapAndStoreReserveMove(node, i , j, children);
-							positions.clear();
-						}
 					}
 				}
 			}
