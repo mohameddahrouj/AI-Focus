@@ -279,7 +279,7 @@ public class Focus extends Program {
 	protected boolean gameOver() {
 		
 		//More than 8 pieces need to be captured to win
-		if (capturedPieces[currentPlayer] >=3) {
+		if (capturedPieces[currentPlayer] >=8) {
 			return true;
 		}
 		
@@ -566,9 +566,13 @@ public class Focus extends Program {
 		return result;
 	}
 	
+	//Current players loss is other players gain
 	public int alphaBetaMiniMax(SearchNode node, int alpha, int beta, int depth, int player){
 		
 		if(depth == uptoDepth || gameOver(node)){
+			//System.out.println("Alpha= " + alpha);
+			//System.out.println("Beta= " + beta);
+			//System.out.println("Heuristic for " + player +" = " + evaluateHeuristic(node, player) + "");
 			return evaluateHeuristic(node, player);
 		}
 		
@@ -576,6 +580,7 @@ public class Focus extends Program {
 		ArrayList<SearchNode> expandedNodes = generateChildren(node);
 		
 		if (expandedNodes.isEmpty()){
+			//System.out.println("Heuristic for " + player +" = " + evaluateHeuristic(node, player) + "");
 			return evaluateHeuristic(node, player);
 		}
 		
@@ -590,13 +595,21 @@ public class Focus extends Program {
 					if(depth == 1){
 						//Sets the best possible next move
 						bestMove = newNode;
+						//System.out.println("CurrentBestMove--> " + bestMove.getMove());
+						//System.out.println("CurrentScore--> " + currentScore);
 					}
 				}
 				
 				if(alpha >= beta){
+					//System.out.println("CurrentBestMove= " + bestMove.getMove());
+					//System.out.println("Alpha= " + alpha);
+					//System.out.println("Beta= " + beta);
 					return alpha;
 				}
 			}
+			//System.out.println("CurrentBestMove= " + bestMove.getMove());
+			//System.out.println("Alpha= " + alpha);
+			//System.out.println("Beta= " + beta);
 			return alpha;
 		} else{
 			for (SearchNode newNode: expandedNodes){
@@ -607,36 +620,53 @@ public class Focus extends Program {
 					if(depth == 1){
 						//Sets the best possible next move
 						bestMove = newNode;
+						//System.out.println("CurrentBestMove--> " + bestMove.getMove());
+						//System.out.println("CurrentScore--> " + currentScore);
 					}
 				}
 				
 				if(beta <= alpha){
+					//System.out.println("CurrentBestMove= " + bestMove.getMove());
+					//System.out.println("Alpha= " + alpha);
+					//System.out.println("Beta= " + beta);
 					return beta;
 				}
 			}
+			//System.out.println("CurrentBestMove= " + bestMove.getMove());
+			//System.out.println("Alpha= " + alpha);
+			//System.out.println("Beta= " + beta);
 			return beta;
 		}
 	}
 	
 	public int evaluateHeuristic(SearchNode node, int player){
 		if(player==GREEN){
-			return playerOneHeuristic(node);
+			return redPlayerHeuristic(node);
 		}
 		
 		else{
-			return playerTwoHeuristic(node);
+			return greenPlayerHeuristic(node);
 		}
 		
 	}
 	
 	//Return the number of opponent pieces I can potentially catch
-	private int playerOneHeuristic(SearchNode node) {
-		return node.getCapturedPieces()[node.getPlayer()] + node.getReserves()[node.getPlayer()];
+	//Maximum score is best
+	private int greenPlayerHeuristic(SearchNode node) {
 		
+		int numCapturedPlusReserve = (node.getCapturedPieces()[node.getPlayer()] + node.getReserves()[node.getPlayer()]);
+		
+		if(numCapturedPlusReserve==0){
+			return node.getBoard()[node.getMove().getr2()][node.getMove().getc2()].size();
+		}
+		else{
+			return node.getBoard()[node.getMove().getr2()][node.getMove().getc2()].size() + numCapturedPlusReserve;
+		}
 	}
-
-	private int playerTwoHeuristic(SearchNode node) {
-		
+	
+	//minumum score is best
+	//Random 
+	private int redPlayerHeuristic(SearchNode node) {
 		int min = 0;
 		int max = 0;
 		for(int i=0; i<BOARD_WIDTH; i++){
@@ -652,6 +682,6 @@ public class Focus extends Program {
 		
 		Random random = new Random();
 		return random.nextInt(max - min + 1) + min;
+	
 	}
-
 }

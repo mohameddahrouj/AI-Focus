@@ -259,9 +259,10 @@ public class FocusGui extends JPanel implements ActionListener{
 				color = "Green";
 			}
 			System.out.println(color + ": " + game.getBestMove().getMove());
-			
+			System.out.println("-------------------------");
 			//Play move
 			AIChoseMove(game.getBestMove().getMove(), node.isPlayFromReserves());
+			isFocusOver();
 			return null;
 	    }
 	    
