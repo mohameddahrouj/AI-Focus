@@ -192,14 +192,14 @@ public class FocusGui extends JPanel implements ActionListener{
 	}
 	
 	/** Reacts to a player clicking on a square. */
-	public void AIChoseMove(Move m, boolean playFromReserves) {
-		aiSource(m, playFromReserves);
-		aiDestination(m, playFromReserves);
+	public void AIChoseMove(Move m) {
+		aiSource(m);
+		aiDestination(m);
 		repaint();
 	}
 
-	public void aiSource(Move m, boolean playFromReserves) {
-		if (playFromReserves && m.getr1() == -1) {
+	public void aiSource(Move m) {
+		if (m.getr1() == -1) {
 			if (game.reserves(game.getCurrentPlayer()) > 0) {
 				reservesBoxes[game.getCurrentPlayer()].setMarked(true);
 				reservesBoxes[game.getCurrentPlayer()].update();
@@ -212,14 +212,15 @@ public class FocusGui extends JPanel implements ActionListener{
 		}
 	}
 	
-	public void aiDestination(Move m, boolean playFromReserves) {
-		if (playFromReserves && sourceRow == -1) {
+	public void aiDestination(Move m) {
+		if (sourceRow == -1) {
 			reservesBoxes[game.getCurrentPlayer()].setMarked(false);
 			reservesBoxes[game.getCurrentPlayer()].update();
 			game.playFromReserves(m.getr2(), m.getc2());
 			chooseDestination(m.getr2(), m.getc2());
 		} else if (game.isLegal(new Move(sourceRow, sourceColumn, m.getr2(), m.getc2()))) {
 			game.move(new Move(sourceRow, sourceColumn, m.getr2(), m.getc2()));
+			//isFocusOver();
 			squares[sourceRow][sourceColumn].setMarked(false);
 			squares[sourceRow][sourceColumn].update();
 			chooseDestination(m.getr2(), m.getc2());
@@ -234,9 +235,9 @@ public class FocusGui extends JPanel implements ActionListener{
 			moveButton.setEnabled(false);
 			
 			if (game.getCurrentPlayer() == game.GREEN) {
-				JOptionPane.showMessageDialog(this," Green, you won!", "Winner Detected", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(this,"Congratulations red, you won!", "Winner Detected", JOptionPane.PLAIN_MESSAGE);
 			} else {
-				JOptionPane.showMessageDialog(this," Red, you won!", "Winner Detected", JOptionPane.PLAIN_MESSAGE);
+				JOptionPane.showMessageDialog(this,"Congratulations green, you won!", "Winner Detected", JOptionPane.PLAIN_MESSAGE);
 			}
 		}
 	}
@@ -251,8 +252,8 @@ public class FocusGui extends JPanel implements ActionListener{
 			game.alphaBetaMiniMax(node, Integer.MIN_VALUE, Integer.MAX_VALUE, 1, game.getCurrentPlayer());
 			//Set game components
 			//game.setPiles(game.getBestMove().getBoard());
-			game.setReserves(game.getBestMove().getReserves());
-			game.setCapturedPieces(game.getBestMove().getCapturedPieces());
+			//game.setReserves(game.getBestMove().getReserves());
+			//game.setCapturedPieces(game.getBestMove().getCapturedPieces());
 			
 			String color = "Red  ";
 			if (game.getCurrentPlayer() == game.GREEN) {
@@ -261,8 +262,8 @@ public class FocusGui extends JPanel implements ActionListener{
 			System.out.println(color + ": " + game.getBestMove().getMove());
 			System.out.println("-------------------------");
 			//Play move
-			AIChoseMove(game.getBestMove().getMove(), node.isPlayFromReserves());
-			isFocusOver();
+			AIChoseMove(game.getBestMove().getMove());
+			//isFocusOver();
 			return null;
 	    }
 	    
