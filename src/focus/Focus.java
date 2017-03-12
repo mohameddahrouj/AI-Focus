@@ -31,6 +31,8 @@ public class Focus extends Program {
 	public final int RED = 1;
 	
 	public int uptoDepth = 2;
+	
+	public boolean randomBoard = true;
 
 	/** The current player (GREEN or RED). */
 	private int currentPlayer;
@@ -62,6 +64,8 @@ public class Focus extends Program {
 	}
 
 	public Focus() {
+		int redPieces = 0;
+		int greenPieces = 0;
 		// Initialize piles
 		piles = new Pile[BOARD_WIDTH][BOARD_WIDTH];
 		for (int r = 0; r < BOARD_WIDTH; r++) {
@@ -71,10 +75,40 @@ public class Focus extends Program {
 		}
 		for (int r = 1; r < 7; r++) {
 			for (int c = 1; c < 7; c++) {
-				if ((r % 2 == 0) == ((c % 4 == 0) || (c % 4 == 3))) {
-					piles[r][c].addFront(GREEN);
-				} else {
-					piles[r][c].addFront(RED);
+				
+				if(!randomBoard){
+					if ((r % 2 == 0) == ((c % 4 == 0) || (c % 4 == 3))) {
+						piles[r][c].addFront(GREEN);
+					} else {
+						piles[r][c].addFront(RED);
+					}
+				}
+				else{
+					int rando = new Random().nextInt(2);
+					if(rando == GREEN){
+						if(greenPieces<18){
+							piles[r][c].addFront(GREEN);
+							greenPieces++;
+						}
+						else{
+							if(redPieces<18){
+								piles[r][c].addFront(RED);
+								redPieces++;
+							}
+						}
+					}
+					if(rando == RED){
+						if(redPieces<18){
+							piles[r][c].addFront(RED);
+							redPieces++;
+						}
+						else{
+							if(greenPieces<18){
+								piles[r][c].addFront(GREEN);
+								greenPieces++;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -87,6 +121,10 @@ public class Focus extends Program {
 		capturedPieces = new int[2];
 		currentPlayer = GREEN;
 		bestMove = null;
+		
+		//System.out.println(redPieces);
+		//System.out.println(greenPieces);
+		
 	}
 	
 	public Pile[][] getPiles(){
@@ -280,6 +318,9 @@ public class Focus extends Program {
 		
 		//More than 8 pieces need to be captured to win
 		if (capturedPieces[currentPlayer] >=8) {
+			return true;
+		}
+		if (capturedPieces[1-currentPlayer] >=8) {
 			return true;
 		}
 		
@@ -655,12 +696,15 @@ public class Focus extends Program {
 	private int greenPlayerHeuristic(SearchNode node) {
 		
 		int numCapturedPlusReserve = (node.getCapturedPieces()[node.getPlayer()] + node.getReserves()[node.getPlayer()]);
-		
+		int pileSizeOfDestination = node.getBoard()[node.getMove().getr2()][node.getMove().getc2()].size();
 		if(numCapturedPlusReserve==0){
-			return node.getBoard()[node.getMove().getr2()][node.getMove().getc2()].size();
+			return pileSizeOfDestination;
+		}
+		if(node.getMove().getr1() == -1){
+			return pileSizeOfDestination + + numCapturedPlusReserve + 100; //Reserve factor
 		}
 		else{
-			return node.getBoard()[node.getMove().getr2()][node.getMove().getc2()].size() + numCapturedPlusReserve;
+			return pileSizeOfDestination + numCapturedPlusReserve;
 		}
 	}
 	
