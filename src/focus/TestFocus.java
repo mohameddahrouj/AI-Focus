@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-public class FocusTest {
+public class TestFocus {
 
 	private Focus game;
 
