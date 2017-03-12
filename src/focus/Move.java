@@ -49,9 +49,14 @@ public class Move {
 	
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
-		sb.append(r1);
-		sb.append(",");
-		sb.append(c1);
+		if(r1==-1 && c1==-1){
+			sb.append("Reserves");
+		}
+		else{
+			sb.append(r1);
+			sb.append(",");
+			sb.append(c1);
+		}
 		sb.append(" to ");
 		sb.append(r2);
 		sb.append(",");

@@ -62,6 +62,7 @@ public class FocusGui extends JPanel implements ActionListener{
 	private Square[][] squares;
 	
 	private JButton moveButton;
+	private JButton simulateButton;
 	private JFrame frame;
 
 	/** Adds component <strong>centered</strong> at x, y. */
@@ -103,11 +104,18 @@ public class FocusGui extends JPanel implements ActionListener{
 		setPreferredSize(new Dimension(600, 700));
 		add(reservesBoxes[game.GREEN], 150, 450);
 		add(reservesBoxes[game.RED], 450, 450);
+		
 		moveButton = new JButton ("Generate green move!");
+		simulateButton = new JButton ("Simulate");
+		
+		moveButton.setActionCommand("move");
+		simulateButton.setActionCommand("simulate");
 		
 		moveButton.addActionListener(this);
+		simulateButton.addActionListener(this);
 		
 		add(moveButton, 300 , 600);
+		add(simulateButton, 300 , 650);
 		mode = CHOOSING_SOURCE;
 		instructions = new Label("Green: click on source square or reserves.");
 		add(instructions, 300, 550);
@@ -149,6 +157,11 @@ public class FocusGui extends JPanel implements ActionListener{
 
 	/** Reacts to a player clicking on a square. */
 	public void squareClicked(int row, int column) {
+		
+		String color = "Red  ";
+		if (game.getCurrentPlayer() == game.GREEN) {
+			color = "Green";
+		}
 		if (mode == CHOOSING_SOURCE) {
 			if (row == -1) {
 				if (game.reserves(game.getCurrentPlayer()) > 0) {
@@ -165,10 +178,22 @@ public class FocusGui extends JPanel implements ActionListener{
 			if (sourceRow == -1) {
 				reservesBoxes[game.getCurrentPlayer()].setMarked(false);
 				reservesBoxes[game.getCurrentPlayer()].update();
+				System.out.println(color + ": " + new Move(-1 , -1, row, column));
 				game.playFromReserves(row, column);
+				if (game.getCurrentPlayer() == game.GREEN) {
+					moveButton.setText("Generate green move!");
+				} else {
+					moveButton.setText("Generate red move!");
+				}
 				chooseDestination(row, column);
 			} else if (game.isLegal(new Move(sourceRow, sourceColumn, row, column))) {
+				System.out.println(color + ": " + new Move(sourceRow, sourceColumn, row, column));
 				game.move(new Move(sourceRow, sourceColumn, row, column));
+				if (game.getCurrentPlayer() == game.GREEN) {
+					moveButton.setText("Generate green move!");
+				} else {
+					moveButton.setText("Generate red move!");
+				}
 				squares[sourceRow][sourceColumn].setMarked(false);
 				squares[sourceRow][sourceColumn].update();
 				chooseDestination(row, column);
@@ -240,7 +265,11 @@ public class FocusGui extends JPanel implements ActionListener{
 			game.setReserves(game.getBestMove().getReserves());
 			game.setCapturedPieces(game.getBestMove().getCapturedPieces());
 			
-			System.out.println(game.getBestMove().getMove());
+			String color = "Red  ";
+			if (game.getCurrentPlayer() == game.GREEN) {
+				color = "Green";
+			}
+			System.out.println(color + ": " + game.getBestMove().getMove());
 			
 			//Play move
 			AIChoseMove(game.getBestMove().getMove(), node.isPlayFromReserves());
@@ -270,7 +299,15 @@ public class FocusGui extends JPanel implements ActionListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		if(arg0.getActionCommand().equals("move")){
 			AIWorker ai = new AIWorker();
 			ai.execute();
+		}
+		if(arg0.getActionCommand().equals("simulate")){
+			AIWorker ai = new AIWorker();
+			while(gameOver){
+				ai.execute();
+			}
+		}
 	}
 }

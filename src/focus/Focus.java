@@ -629,20 +629,23 @@ public class Focus extends Program {
 		
 	}
 	
+	//Return the number of opponent pieces I can potentially catch
 	private int playerOneHeuristic(SearchNode node) {
-		int numOfOpponentPieces = 0;
-		
+		int min = 0;
+		int max = 0;
 		for(int i=0; i<BOARD_WIDTH; i++){
 			for(int j=0; j<node.getBoard()[i].length; j++){
-				if(node.getBoard()[i][j]!=null && node.getBoard()[i][j].size()>=1){
-					if(node.getBoard()[i][j].getFront() == node.getPlayer()){
-						numOfOpponentPieces++;
+				if(node.getBoard()[i][j]!=null){
+					max++;
+					if(node.getBoard()[i][j].size()>=1){
+						min++;
 					}
 				}
 			}
 		}
 		
-		return numOfOpponentPieces - node.getCapturedPieces()[node.getPlayer()];
+		Random random = new Random();
+		return random.nextInt(max - min + 1) + min;
 		
 	}
 
