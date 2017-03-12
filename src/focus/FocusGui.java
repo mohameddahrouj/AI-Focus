@@ -62,7 +62,6 @@ public class FocusGui extends JPanel implements ActionListener{
 	private Square[][] squares;
 	
 	private JButton moveButton;
-	private JButton simulateButton;
 	private JFrame frame;
 
 	/** Adds component <strong>centered</strong> at x, y. */
@@ -101,21 +100,18 @@ public class FocusGui extends JPanel implements ActionListener{
 		reservesBoxes[game.GREEN] = new ReservesBox(game.GREEN, this);
 		reservesBoxes[game.RED] = new ReservesBox(game.RED, this);
 		setLayout(null);
-		setPreferredSize(new Dimension(600, 700));
+		setPreferredSize(new Dimension(600, 600));
 		add(reservesBoxes[game.GREEN], 150, 450);
 		add(reservesBoxes[game.RED], 450, 450);
 		
 		moveButton = new JButton ("Generate green move!");
-		simulateButton = new JButton ("Simulate");
 		
 		moveButton.setActionCommand("move");
-		simulateButton.setActionCommand("simulate");
 		
 		moveButton.addActionListener(this);
-		simulateButton.addActionListener(this);
 		
 		add(moveButton, 300 , 600);
-		add(simulateButton, 300 , 650);
+		
 		mode = CHOOSING_SOURCE;
 		instructions = new Label("Green: click on source square or reserves.");
 		add(instructions, 300, 550);
@@ -131,15 +127,8 @@ public class FocusGui extends JPanel implements ActionListener{
 		} else {
 			color = "Red";
 		}
-		if (game.gameOver()) {
-			instructions.setText("Game over.");
-			moveButton.setText("Game Over");
-			moveButton.setEnabled(false);
-			
-			JOptionPane.showMessageDialog(this, color + ", you won!", "Winner Detected", JOptionPane.PLAIN_MESSAGE);
-		} else {
-			instructions.setText(color + ": click on source square or reserves.");
-		}
+		instructions.setText(color + ": click on source square or reserves.");
+
 	}
 	
 	/** Reacts to a player choosing a destination. */
@@ -302,12 +291,6 @@ public class FocusGui extends JPanel implements ActionListener{
 		if(arg0.getActionCommand().equals("move")){
 			AIWorker ai = new AIWorker();
 			ai.execute();
-		}
-		if(arg0.getActionCommand().equals("simulate")){
-			AIWorker ai = new AIWorker();
-			while(gameOver){
-				ai.execute();
-			}
 		}
 	}
 }
