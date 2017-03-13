@@ -701,7 +701,7 @@ public class Focus extends Program {
 			return pileSizeOfDestination;
 		}
 		if(node.getMove().getr1() == -1){
-			return pileSizeOfDestination + + numCapturedPlusReserve + 100; //Reserve factor
+			return pileSizeOfDestination + numCapturedPlusReserve + 100; //Reserve play factor
 		}
 		else{
 			return pileSizeOfDestination + numCapturedPlusReserve;
@@ -709,23 +709,15 @@ public class Focus extends Program {
 	}
 	
 	//minumum score is best
-	//Random 
 	private int redPlayerHeuristic(SearchNode node) {
-		int min = 0;
-		int max = 0;
-		for(int i=0; i<BOARD_WIDTH; i++){
-			for(int j=0; j<node.getBoard()[i].length; j++){
-				if(node.getBoard()[i][j]!=null){
-					max++;
-					if(node.getBoard()[i][j].size()>=1){
-						min++;
-					}
-				}
-			}
-		}
+		int pileSizeOfDestination = node.getBoard()[node.getMove().getr2()][node.getMove().getc2()].size();
 		
-		Random random = new Random();
-		return random.nextInt(max - min + 1) + min;
+		if(pileSizeOfDestination==0){
+			return 0 - new Random().nextInt(53); //Random to change things up
+		}
+		else{
+			return pileSizeOfDestination - (pileSizeOfDestination*pileSizeOfDestination) - new Random().nextInt(53);
+		}
 	
 	}
 }
