@@ -276,6 +276,8 @@ public class FocusGui extends JPanel implements ActionListener{
 	    @Override
 	    protected void done() {
 			isFocusOver();
+			System.out.println(game.toString());
+			System.out.println("-------------------------");
 			if(!gameOver){
 				if (game.getCurrentPlayer() == game.GREEN) {
 					moveButton.setText("Generate green move!");
