@@ -716,7 +716,7 @@ public class Focus extends Program {
 			return 0 - new Random().nextInt(53); //Random to change things up
 		}
 		else{
-			return pileSizeOfDestination - (pileSizeOfDestination*pileSizeOfDestination) - new Random().nextInt(53);
+			return 0- pileSizeOfDestination - (pileSizeOfDestination*pileSizeOfDestination) - new Random().nextInt(53);
 		}
 	
 	}
