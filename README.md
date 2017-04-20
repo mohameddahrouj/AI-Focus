@@ -1,3 +1,3 @@
 # AI-Focus
 SYSC 4106- Assignment #2
-Solving Focus a.k.a Domination using Mini-max search algorithms.
+Solving the notorious Focus a.k.a Domination game using the alpha beta mini-max search algorithm.
